@@ -1,7 +1,7 @@
 import sys
 import math
 
-file = open("Test1")
+file = open(sys.stdin)
 people = {}
 
 
@@ -20,7 +20,6 @@ def getDescendents(subject):
     if (subject not in people):
         return subject
     descendents = people[subject]
-    print(descendents)
     for kid in descendents:
         if (kid in people):
             descendents.extend(getDescendents(kid))
@@ -29,10 +28,6 @@ def getDescendents(subject):
 def areCousins(person1, person2):
     if person1 == person2:
         return False
-    # if person1 in people.get(person2):
-    #     return False
-    # if person2 in people.get(person1):
-    #     return False
     for anc in getAncestors(person1):
         if anc in getAncestors(person2):
             return True
@@ -43,12 +38,10 @@ def areCousinsDegree(person1, person2, degree):
         return False
     gencount1 = 0
     gencount2 = 0
-    # print(getAncestors(person1), getAncestors(person2))
     commonAnc = []
     for anc in getAncestors(person1):
         if anc in getAncestors(person2):
             commonAnc.append(anc)
-    # print(commonAnc)
     for i in getAncestors(person1):
         gencount1 += 1
         if i in commonAnc:
@@ -60,12 +53,9 @@ def areCousinsDegree(person1, person2, degree):
 
     gencount1 = math.ceil(gencount1 / 2)
     gencount2 = math.ceil(gencount2 / 2)
-    # print(gencount1,gencount2)
     gencount1 -= 1
     gencount2 -= 1
-    # print(gencount1,gencount2)
     minCount = min(gencount1, gencount2)
-    # print(minCount,degree)
     if int(minCount) == int(degree):
         return True
 
@@ -99,11 +89,10 @@ def getUnrelated(subject):
             outp.append(person)
     return outp
 
-
 def getCousins(subject):
     outp = []
     for cousin in people:
-        if (areCousins(subject,cousin)):
+        if areCousins(subject,cousin):
             outp.append(cousin)
     return outp
 
@@ -115,10 +104,6 @@ def getCousinsDegree(subject, degree):
     return outp
 
 
-
-# call arecousins function for all
-
-#    print("here we get", subject, "'s cousins")
 for line in file:
     command = line[0]
     contents = line.split()
@@ -133,8 +118,7 @@ for line in file:
             else:
                 people[contents[2]] = [contents[3]]
     if (command == "W"):
-        # child, sibling, ancestor, cousin, descendent, unrelated
-        print("broad query ->", line[1:])
+        print(line[0:])
         if len(contents) == 3:
             key = contents[1]
             subject = contents[2]
@@ -147,49 +131,50 @@ for line in file:
                         for potentialSibling in people[parent]:
                             if (potentialSibling != subject and potentialSibling not in siblings):
                                 siblings.append(potentialSibling)
-                print("the siblings are", ", ".join(siblings))
+                print("\n".join(siblings))
             if (key == "ancestor"):
                 ancestors = getAncestors(subject)
-                print("the ancestors are", ", ".join(ancestors))
+                print("\n".join(ancestors))
             if (key == "descendent"):
                 descendents = getDescendents(subject)
-                print("the descendents are", ", ".join(descendents))
+                print("\n".join(descendents))
             if (key == "cousin"):
                 cousins = getCousins(subject)
-                print("the cousins are", ", ".join(cousins))
+                print("\n".join(cousins))
             if (key == "unrelated"):
                 unrelated = getUnrelated(subject)
-                print("the unrelated are", ", ".join(unrelated))
+                print("\n".join(unrelated))
         if len(contents) == 4:
             key = contents[1]
             if (key == "cousin"):
                 subject = contents[3]
                 degree = contents[2]
                 cousins = getCousinsDegree(subject,degree)
-                print("the",degree,"degree cousins are", ", ".join(cousins))
+                print("\n".join(cousins))
     if (command == "X"):
+        print(line[0:])
         if len(contents) == 4:
             subject = contents[3]
             personInQuestion = contents[1]
             relation = contents[2]
-            print("we're looking at ", subject, personInQuestion, "and their relationship as", relation)
+            # print("we're looking at ", subject, personInQuestion, "and their relationship as", relation)
             if (relation == "child"):
                 if (personInQuestion in people.get(subject)):
-                    print(personInQuestion, "is a child of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT a child of", subject)
+                    print("No")
             if (relation == "ancestor"):
                 ancestors = getAncestors(subject)
                 if (personInQuestion in ancestors):
-                    print(personInQuestion, "is an ancestor of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT an ancestor of", subject)
+                    print("No")
             if (relation == "descendent"):
                 descendents = getDescendents(subject)
                 if (personInQuestion in descendents):
-                    print(personInQuestion, "is a descendent of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT a descendent of", subject)
+                    print("No")
             if (relation == "sibling"):
                 siblings = []
                 for parent, child in people.items():
@@ -198,19 +183,19 @@ for line in file:
                             if (potentialSibling != subject and potentialSibling not in siblings):
                                 siblings.append(potentialSibling)
                 if (personInQuestion in siblings):
-                    print(personInQuestion, "is a sibling of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT a sibling of", subject)
+                    print("No")
             if (relation == "unrelated"):
                 if isUnrelated(personInQuestion,subject):
-                    print(personInQuestion, "is unrelated to", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT unrelated to", subject)
+                    print("No")
             if relation == "cousin":
                 if areCousins(personInQuestion, subject):
-                    print(personInQuestion, "is a cousin of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT a cousin of", subject)
+                    print("No")
         if len(contents) == 5:
             relation = contents[2]
             if (relation == "cousin"):
@@ -218,10 +203,8 @@ for line in file:
                 subject = contents[4]
                 personInQuestion = contents[1]
                 if areCousinsDegree(personInQuestion, subject, degree):
-                    print(personInQuestion, "is a ", degree,"th cousin of", subject)
+                    print("Yes")
                 else:
-                    print(personInQuestion, "is NOT a", degree,"degree cousin of", subject)
+                    print("No")
 
-
-# print(people)
 file.close()
